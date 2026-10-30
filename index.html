@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>3rd World Farmer - Custom Mod Server</title>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+        iframe { width: 100%; height: 100%; border: none; }
+    </style>
+</head>
+<body>
+    <!-- Pull the baseline image canvas layout while executing your Gist overrides -->
+    <iframe id="gameFrame" src="https://allorigins.win"></iframe>
+
+    <script>
+        const frame = document.getElementById('gameFrame');
+        
+        // This injects your patch engine rules directly into the mirrored layout canvas
+        frame.onload = function() {
+            const frameWindow = frame.contentWindow;
+            
+            const patchMap = {
+                "AllInvestments.js": "https://gist.githubusercontent.com/PersonDudeGuy/0fc18cc2a24ec614b741050c28314ee2/raw/d88d8b193a166ebdf1501840b01fc1dd9dad9f20/AllInvestments.js",
+                "AllMenuChoices.js": "https://gist.githubusercontent.com/PersonDudeGuy/0fc18cc2a24ec614b741050c28314ee2/raw/d88d8b193a166ebdf1501840b01fc1dd9dad9f20/AllMenuChoices.js",
+                "Language.js": "https://gist.githubusercontent.com/PersonDudeGuy/0fc18cc2a24ec614b741050c28314ee2/raw/d88d8b193a166ebdf1501840b01fc1dd9dad9f20/Language.js",
+                "game.js": "https://gist.githubusercontent.com/PersonDudeGuy/0fc18cc2a24ec614b741050c28314ee2/raw/d88d8b193a166ebdf1501840b01fc1dd9dad9f20/game.js"
+            };
+
+            const originalFetch = frameWindow.fetch;
+            frameWindow.fetch = async function(...args) {
+                let url = args[0];
+                if (typeof url === 'string') {
+                    for (const [targetFile, replacementUrl] of Object.entries(patchMap)) {
+                        if (url.includes(targetFile)) {
+                            args[0] = replacementUrl;
+                            break;
+                        }
+                    }
+                }
+                return originalFetch.apply(this, args);
+            };
+        };
+    </script>
+</body>
+</html>
